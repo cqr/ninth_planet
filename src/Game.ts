@@ -91,12 +91,12 @@ export interface GameState {
 
 export interface MissionConfig {
   tasks: number;
-  tokens: {[key in Token]: boolean };
+  tokens: { [key in Token]: boolean };
 }
 
 const Deck: ICard[] = flatten([Suit.Pink, Suit.Blue, Suit.Green, Suit.Orange].map((suit) => {
-  return new Array(9).fill(undefined).map((_, index) => ({suit, value: index + 1}));
-})).concat(new Array(4).fill('undefined').map((_, index) => ({suit: Suit.Rocket, value: index + 1 })));
+  return new Array(9).fill(undefined).map((_, index) => ({ suit, value: index + 1 }));
+})).concat(new Array(4).fill('undefined').map((_, index) => ({ suit: Suit.Rocket, value: index + 1 })));
 
 function sortHand(hand: ICard[]): ICard[] {
   return hand.sort((a, b) => {
@@ -118,14 +118,14 @@ export const NinthPlanet: Game<GameState> = {
 
   name: 'NinthPlanet',
 
-  setup: (ctx, setupData):GameState => {
+  setup: (ctx, setupData): GameState => {
     const deck = ctx.random!.Shuffle(Deck);
 
     const hands = Array(ctx.numPlayers).fill(undefined).map<PlayerState>((_, playerNumber) => {
       const hand = sortHand(deck.filter((_, ci) => ci % ctx.numPlayers === playerNumber));
       return { hand, commsTokenState: CommsState.Unused, tasks: [] };
     });
-    const players = hands.reduce<{[playerId: string]: PlayerState}>((c, n, i) => { c[i.toString()] = n; return c }, {});
+    const players = hands.reduce<{ [playerId: string]: PlayerState }>((c, n, i) => { c[i.toString()] = n; return c }, {});
     const captain = hands.findIndex(isCaptain).toString();
     const val: GameState = {
       captain,
@@ -148,26 +148,26 @@ export const NinthPlanet: Game<GameState> = {
   phases: {
     join: {
       start: true,
-      onBegin(_, ctx) { ctx.events?.setActivePlayers?.({all: 'join' })},
+      onBegin(_, ctx) { ctx.events?.setActivePlayers?.({ all: 'join' }) },
       endIf: G => {
         return Object.values(G.team).filter(teammate => !teammate.playerName).length === 0;
       },
       next: 'defineMission'
     },
     defineMission: {
-      onBegin(_, ctx) { ctx.events?.setActivePlayers?.({all: 'defineMission'})},
+      onBegin(_, ctx) { ctx.events?.setActivePlayers?.({ all: 'defineMission' }) },
       next: 'selectTasks'
     },
     selectTasks: {
       endIf: G => G.tasks.length === 0,
       moves: {
-        selectTask(G, ctx, taskIndex:number) {
+        selectTask(G, ctx, taskIndex: number) {
           const playerID = ctx.playerID || ctx.currentPlayer;
           const task = G.tasks[taskIndex];
           const tasks = G.tasks.filter((_, i) => i !== taskIndex);
           const teammate = derivePlayerTeamState(G.players[playerID], G.team[playerID]);
           ctx.events?.endTurn?.();
-          return { ...G, tasks, team: { ...G.team, [playerID]: {...teammate, tasks: teammate.tasks.concat({...task, complete: false})}}};
+          return { ...G, tasks, team: { ...G.team, [playerID]: { ...teammate, tasks: teammate.tasks.concat({ ...task, complete: false }) } } };
         }
       },
       next: 'play'
@@ -175,26 +175,26 @@ export const NinthPlanet: Game<GameState> = {
     play: {
       onBegin(G, ctx) {
         const stages = Object.keys(G.players).filter(playerID => G.team[playerID].commsTokenState === CommsState.Unused)
-        .reduce<{[x:string]:'wait'}>((c, pid) => {
-          c[pid] = 'wait';
-          return c;
-        }, {});
-        ctx.events?.setActivePlayers?.({value: stages, revert: true});
+          .reduce<{ [x: string]: 'wait' }>((c, pid) => {
+            c[pid] = 'wait';
+            return c;
+          }, {});
+        ctx.events?.setActivePlayers?.({ value: stages, revert: true });
       },
       endIf: (G, ctx) => G.trick.cards.length >= ctx.numPlayers,
-      onEnd(G, ctx){
+      onEnd(G, ctx) {
         const leadSuit = G.trick.cards[0].suit;
         const highCard = getHighCard(G.trick.cards, leadSuit);
         const highCardIndex = G.trick.cards.findIndex(card => matchCards(highCard, card));
         const winner = ctx.playOrder[highCardIndex];
-        const allTaskCards = flatten(Object.keys(G.team).map(playerID => G.team[playerID].tasks.map(x => ({...x, playerID}))));
+        const allTaskCards = flatten(Object.keys(G.team).map(playerID => G.team[playerID].tasks.map(x => ({ ...x, playerID }))));
         const team = { ...G.team };
 
         for (const card of G.trick.cards) {
           const task = allTaskCards.find(task => cardCmp(card, task.card) === 0)
           if (task) {
             if (task.playerID === winner) {
-              team[winner] = {...team[winner], tasks: team[winner].tasks.map(task => cardCmp(task.card, card) === 0 ? { ...task, complete: true} : task )}
+              team[winner] = { ...team[winner], tasks: team[winner].tasks.map(task => cardCmp(task.card, card) === 0 ? { ...task, complete: true } : task) }
             } else {
               ctx.events?.endGame?.('failed');
             }
@@ -202,16 +202,16 @@ export const NinthPlanet: Game<GameState> = {
         }
 
         const lastTrick = { winner, cards: G.trick.cards };
-        const trick = { leadPlayer: winner, cards: []};
+        const trick = { leadPlayer: winner, cards: [] };
         return { ...G, team, trick, lastTrick, secret: { ...G.secret, tricks: G.secret.tricks.push(lastTrick) } };
       },
 
       moves: {
         playCard: {
-          move: (G:GameState, ctx: Ctx, card: ICard) => {
+          move: (G: GameState, ctx: Ctx, card: ICard) => {
             const playerID = ctx.playerID || ctx.currentPlayer;
             const activePlayer = G.players[playerID];
-      
+
             const cardIndex = activePlayer.hand.findIndex(handCard => matchCards(handCard, card));
             if (cardIndex === -1) {
               return INVALID_MOVE;
@@ -221,13 +221,13 @@ export const NinthPlanet: Game<GameState> = {
             if (!isValidPlay(activePlayer.hand, G.trick.cards, activePlayer.hand[cardIndex])) {
               return INVALID_MOVE;
             }
-      
+
             const trickCards: ICard[] = trick.slice(0).concat(activePlayer.hand[cardIndex]);
-            const players = { ...G.players, [playerID]: { ...activePlayer, hand: activePlayer.hand.filter(handCard => !matchCards(handCard, card))}}
-            const team = { ...G.team, [playerID]: derivePlayerTeamState(players[playerID], G.team[playerID])};
-      
+            const players = { ...G.players, [playerID]: { ...activePlayer, hand: activePlayer.hand.filter(handCard => !matchCards(handCard, card)) } }
+            const team = { ...G.team, [playerID]: derivePlayerTeamState(players[playerID], G.team[playerID]) };
+
             ctx.events?.endTurn?.();
-            return { ...G, trick: {...G.trick, cards: trickCards}, players, team };
+            return { ...G, trick: { ...G.trick, cards: trickCards }, players, team };
           },
           client: false
         }
@@ -243,18 +243,18 @@ export const NinthPlanet: Game<GameState> = {
           setName: (G, ctx, name) => {
             console.log(ctx);
             const playerID = ctx.playerID || ctx.currentPlayer;
-            const me = {...G.players[playerID], name: name};
+            const me = { ...G.players[playerID], name: name };
             ctx.events?.endStage?.();
-            return { ...G, players: {...G.players, [playerID]: me}, team: {...G.team, [playerID]: derivePlayerTeamState(me, G.team[playerID])}};
+            return { ...G, players: { ...G.players, [playerID]: me }, team: { ...G.team, [playerID]: derivePlayerTeamState(me, G.team[playerID]) } };
           }
         }
       },
       defineMission: {
         moves: {
-          defineMission(G, ctx, config: MissionConfig ) {
-            const cards = ctx.random?.Shuffle(Deck.filter(x => x.suit !== Suit.Rocket )).slice(0, config.tasks) || [];
+          defineMission(G, ctx, config: MissionConfig) {
+            const cards = ctx.random?.Shuffle(Deck.filter(x => x.suit !== Suit.Rocket)).slice(0, config.tasks) || [];
             const tokens = SortedTokens.filter(x => config.tokens[x]);
-            const tasks: ITask[] = cards.map((card, i) => ({card, token: tokens[i]}) );
+            const tasks: ITask[] = cards.map((card, i) => ({ card, token: tokens[i] }));
             ctx.events?.endPhase?.('play');
             return { ...G, tasks };
           }
@@ -281,8 +281,8 @@ export const NinthPlanet: Game<GameState> = {
               }
               const cardsOfSuit = currentPlayer.hand.filter(x => x.suit === card.suit);
               const commsTokenState = highLowOnly(card, cardsOfSuit);
-              const me = {...currentPlayer, commsTokenState, commsTokenCard: card};
-              const players = { ...G.players, [playerID]:me};
+              const me = { ...currentPlayer, commsTokenState, commsTokenCard: card };
+              const players = { ...G.players, [playerID]: me };
               ctx.events?.endStage?.();
               return { ...G, players, team: { ...G.team, [playerID]: derivePlayerTeamState(me, G.team[playerID]) } };
             }
@@ -310,7 +310,7 @@ export const NinthPlanet: Game<GameState> = {
   }
 };
 
-function matchCards(card1:ICard, card2:ICard): boolean {
+function matchCards(card1: ICard, card2: ICard): boolean {
   return card1.value === card2.value && card1.suit === card2.suit;
 }
 
@@ -320,8 +320,8 @@ function getHighCard(cards: ICard[], suit: Suit) {
   return filteredCards.sort((a, b) => b.value - a.value)[0];
 }
 
-function deriveTeamState(players: {[playerId: string]: PlayerState}, teammates?: {[playerId: string]: ITeammate}): {[teammateId: string]: ITeammate} {
-  const team: {[teammateId: string]: ITeammate} = {};
+function deriveTeamState(players: { [playerId: string]: PlayerState }, teammates?: { [playerId: string]: ITeammate }): { [teammateId: string]: ITeammate } {
+  const team: { [teammateId: string]: ITeammate } = {};
   for (const teammateId of Object.keys(players)) {
     team[teammateId] = derivePlayerTeamState(players[teammateId], teammates?.[teammateId]);
   }
@@ -339,7 +339,7 @@ function derivePlayerTeamState(player: PlayerState, teammate?: ITeammate): ITeam
 }
 
 
-export function isValidPlay(hand: ICard[], trick: ICard[], card: ICard, transmitting=false) {
+export function isValidPlay(hand: ICard[], trick: ICard[], card: ICard, transmitting = false) {
   if (transmitting) {
     if (card.suit === Suit.Rocket) {
       return false;
@@ -361,10 +361,10 @@ function highLowOnly(card: ICard, cardsOfSuit: ICard[]) {
   }
 }
 
-function cardCmp(card1:ICard, card2:ICard) {
+function cardCmp(card1: ICard, card2: ICard) {
   return (card1.suit * 10 + card1.value) - (card2.suit * 10 + card2.value);
 }
 
-function flatten<T>(data: (T[]|T)[]): T[] {
+function flatten<T>(data: (T[] | T)[]): T[] {
   return (Array.isArray(data[0]) ? data[0] : [data[0]]).concat(...data.slice(1));
 }
