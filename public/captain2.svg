@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<svg width="98" height="200" xmlns="http://www.w3.org/2000/svg">
+ <g>s
+  <g id="svg_4">
+   <line stroke="#ffa100" stroke-linecap="undefined" stroke-linejoin="undefined" id="svg_35" y2="88.800501" x2="-6.699499" y1="152" x1="56.5" stroke-width="20" fill="none"/>
+   <line transform="rotate(-90 73.9002 120.4)" stroke="#ffa100" stroke-linecap="undefined" stroke-linejoin="undefined" id="svg_36" y2="88.800501" x2="42.300501" y1="152" x1="105.5" stroke-width="20" fill="none"/>
+  </g>
+  <g id="svg_7">
+   <line stroke="#ffa100" stroke-linecap="undefined" stroke-linejoin="undefined" id="svg_38" y2="49.800501" x2="-6.699499" y1="113" x1="56.5" stroke-width="20" fill="none"/>
+   <line transform="rotate(-90 73.9003 81.4003)" stroke="#ffa100" stroke-linecap="undefined" stroke-linejoin="undefined" id="svg_39" y2="49.800501" x2="42.300501" y1="113" x1="105.5" stroke-width="20" fill="none"/>
+  </g>
+  <g id="svg_14">
+   <line stroke="#ffa100" stroke-linecap="undefined" stroke-linejoin="undefined" id="svg_41" y2="9.800501" x2="-6.699499" y1="73" x1="56.5" stroke-width="20" fill="none"/>
+   <line transform="rotate(-90 73.9003 41.4003)" stroke="#ffa100" stroke-linecap="undefined" stroke-linejoin="undefined" id="svg_42" y2="9.800501" x2="42.300501" y1="73" x1="105.5" stroke-width="20" fill="none"/>
+  </g>
+  <g id="svg_18">
+   <line stroke="#ffa100" stroke-linecap="undefined" stroke-linejoin="undefined" id="svg_44" y2="128.800501" x2="-6.699499" y1="192" x1="56.5" stroke-width="20" fill="none"/>
+   <line transform="rotate(-90 73.9002 160.4)" stroke="#ffa100" stroke-linecap="undefined" stroke-linejoin="undefined" id="svg_45" y2="128.800501" x2="42.300501" y1="192" x1="105.5" stroke-width="20" fill="none"/>
+  </g>
+ </g>
+</svg>

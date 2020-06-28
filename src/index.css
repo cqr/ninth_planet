@@ -1,13 +1,658 @@
+@import url('https://fonts.googleapis.com/css2?family=Sarpanch:wght@400;700;900&display=swap');
+
+html {
+  height: 100%;
+}
+
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+  font-family: 'Sarpanch', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  /* overflow:hidden; */
+  background-color: rgb(0, 0, 49);
+  background-size: 600px 100%;
+  height: 100%;
+  color: white;
+
+  --large-card-height: 80px;
+  --large-card-hover-scale: 1.4;
+  --large-card-value-size: calc(16px + 0.07 * var(--large-card-height));
+
+  --small-card-height: 40px;
+}
+
+@media only screen and (min-width: 500px) {
+  body {
+    --large-card-height: 100px;
+  }
+}
+
+@media only screen and (min-width: 650px) {
+  body {
+    --large-card-height: 120px;
+  }
+}
+
+@media only screen and (min-width: 600px) {
+  body {
+    --large-card-height: 140px;
+    --large-card-hover-scale: 1.2;
+  }
+}
+
+@media only screen and (min-width: 700px) {
+  body {
+    --large-card-height: 160px;
+  }
+}
+
+@media only screen and (min-width: 800px) {
+  body {
+    --large-card-height: 180px;
+    --large-card-hover-scale: 1.1;
+  }
+}
+
+@media only screen and (min-width: 1000px) {
+  body {
+    --large-card-height: 200px;
+  }
+}
+
+@media only screen and (min-width: 1200px) {
+  body {
+    --large-card-height: 220px;
+  }
+}
+
+@media only screen and (min-width: 1400px) {
+  body {
+    --large-card-height: 240px;
+  }
+}
+
+
+
+.board {
+  position: relative;
+  /* height: 600px; */
+  /* margin-bottom: 650px; */
+  background-image: linear-gradient(to bottom,black 0%, black 30%, rgb(0, 0, 49) 50%, rgb(0, 0, 49) 100%);
+  overflow: hidden;
+  border: 1px solid white;
+  display: flex;
+  flex-flow: column;
 }
 
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+.team {
+  flex: 0 0 auto;
+}
+
+.hand {
+  --card-height: var(--large-card-height);
+  --value-size: var(--large-card-value-size);
+  --hover-scale: var(--large-card-hover-scale);
+
+  --hand-min-height: calc(1.5 * var(--value-size) + 80px);
+  flex: 0 0 var(--hand-min-height);
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: center;
+  min-height: var(--hand-min-height);
+  max-height: var(--card-height);
+  padding: 0 60px;
+}
+
+.board .active {
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: center;
+  align-content: center;
+  width: 100%;
+  flex: 10 0 100px;
+}
+
+/* Card Definition */
+.card {
+  transition: transform 0.1s, filter 0.1s;
+  position: relative;
+  flex: 1 0 var(--min-card-visible);
+  z-index: 11;
+  min-width: var(--min-card-visible);
+  max-width: var(--max-card-visible);
+  
+}
+
+.card .value {
+  position: relative;
+  z-index: 12;
+  padding: calc(0.75 * var(--value-size));
+  font-weight: 900;
+  color: white;
+  font-size: var(--value-size);
+  line-height: var(--value-size);
+  -webkit-text-stroke: calc(0.05 * var(--value-size)) white;
+  -webkit-text-fill-color: rgba(255, 255, 255, 0.4);
+}
+
+.card:last-of-type {
+  min-width: var(--card-width);
+  max-width: var(--card-width);
+  flex: 0 0 var(--card-width);
+}
+
+.card::before {
+  width: var(--card-width);
+  height: var(--card-height);
+  display: block;
+  box-sizing: border-box;
+  background-color: white;
+  box-shadow: 0 0 2px rgba(0,0,0,0.2);
+  border-radius: var(--card-border-radius);
+  border: var(--card-border-width) solid white;
+  
+  content: '';
+  z-index: 10;
+  position: absolute;
+}
+
+.card.played {
+  display:none;
+}
+
+.card.suit-0::before {
+  background-color: black;
+}
+.card.suit-1::before {
+  background-color: rgb(245, 97, 121);
+}
+.card.suit-2::before {
+  background-color: rgb(0, 162, 190);
+}
+.card.suit-3::before {
+  background-color: rgb(0, 98, 0);
+}
+.card.suit-4::before {
+  background-color: orange;
+}
+
+.card.suit-back::before {
+  background-color: #333;
+  content: '?';
+  width: var(--card-width);
+  text-align: center;
+  line-height: calc(var(--card-height) - 2 * var(--card-border-width));
+  color: #fcfcfc;
+}
+
+.card.invalid {
+  filter: grayscale(10%) brightness(60%);
+  cursor: not-allowed;
+}
+
+/* In-Hand Card Overrides */
+.hand .card {
+  cursor: pointer;
+}
+
+.hand .card:nth-of-type(1) {
+  transform: translate(40px, 60px) rotate( -30deg );
+}
+.hand .card:nth-of-type(2) {
+  transform: translate(25px, 38px) rotate( -20deg );
+}
+.hand .card:nth-of-type(3) {
+  transform: translate(15px, 18px) rotate( -14deg );
+}
+.hand .card:nth-of-type(4) {
+  transform: translate(6px, 9px) rotate( -9deg );
+}
+.hand .card:nth-of-type(5) {
+  transform: translate(4px, 5px) rotate( -7deg );
+}
+.hand .card:nth-of-type(6) {
+  transform: translate(2px, 2px) rotate( -4deg );
+}
+.hand .card:nth-of-type(7) {
+  transform: rotate( -1deg );
+}
+.hand .card:nth-last-of-type(7) {
+  transform: rotate( 1deg );
+}
+.hand .card:nth-last-of-type(4) {
+  transform: translate(-6px, 9px) rotate( 9deg );
+}
+.hand .card:nth-last-of-type(5) {
+  transform: translate(-4px, 5px) rotate( 7deg );
+}
+.hand .card:nth-last-of-type(6) {
+  transform: translate(-2px, 2px) rotate( 4deg );
+}
+.hand .card:nth-last-of-type(3) {
+  transform: translate(-15px, 14px) rotate( 14deg );
+}
+.hand .card:nth-last-of-type(2) {
+  transform: translate(-25px, 20px) rotate( 20deg );
+}
+.hand .card:nth-last-of-type(1) {
+  transform: translate(-40px, 45px) rotate( 30deg );
+}
+
+.hand .card:hover, .active .card:hover {
+  z-index: 15;
+}
+
+.hand .card:hover {
+  transform: scale(var(--hover-scale)) translate(0, calc(-30px + (var(--hand-min-height) - var(--card-height))));
+}
+
+.hand .card.invalid:hover {
+  filter: brightness(60%);
+}
+
+/* Teammate Card Overrides */
+
+.teammate {
+  --card-height: var(--small-card-height);
+  /* --value-size: 32px; */
+}
+
+.teammate .tmhand {
+  display: flex;
+  --card-height: var(--small-card-height);
+  --value-size: 10px;
+}
+
+.tmhand .card.suit-back:nth-of-type(1):last-of-type::after {
+  content: '1';
+}
+.tmhand .card.suit-back:nth-of-type(2):last-of-type::after {
+  content: '2';
+}
+.tmhand .card.suit-back:nth-of-type(3):last-of-type::after {
+  content: '3';
+}
+.tmhand .card.suit-back:nth-of-type(4):last-of-type::after {
+  content: '4';
+}
+.tmhand .card.suit-back:nth-of-type(5):last-of-type::after {
+  content: '5';
+}
+.tmhand .card.suit-back:nth-of-type(6):last-of-type::after {
+  content: '6';
+}
+.tmhand .card.suit-back:nth-of-type(7):last-of-type::after {
+  content: '7';
+}
+.tmhand .card.suit-back:nth-of-type(8):last-of-type::after {
+  content: '8';
+}
+.tmhand .card.suit-back:nth-of-type(9):last-of-type::after {
+  content: '9';
+}
+.tmhand .card.suit-back:nth-of-type(10):last-of-type::after {
+  content: '10';
+}
+.tmhand .card.suit-back:nth-of-type(11):last-of-type::after {
+  content: '11';
+}
+.tmhand .card.suit-back:nth-of-type(12):last-of-type::after {
+  content: '12';
+}
+
+.tmhand .card.suit-back:nth-of-type(13):last-of-type::after {
+  content: '13';
+}
+.tmhand .card.suit-back:nth-of-type(14):last-of-type::after {
+  content: '14';
+}
+
+.tmhand, .teammate .tasks {
+  height: var(--card-height);
+  flex: 1 0 auto;
+}
+
+.teammate .tasks {
+  position: relative;
+  padding-left: 30px;
+}
+
+.teammate .tasks::before {
+  content: 'Tasks';
+  transform: rotate(-90deg) ;
+  display: block;
+  position: absolute;
+  left: -9px;
+  height: 30px;
+  line-height: 30px;
+  font-size: 12px;
+  width: var(--card-height);
+  pointer-events: none;
+  top: 0;
+}
+
+/* 
+.teammate .card {
+  text-align: center;
+  color: white;
+} */
+
+
+.token {
+  width: 50px; height: 50px;
+  position: absolute;
+  bottom: 30px;
+  right: 30px;
+}
+
+.active h1 {
+  flex-basis: 100%;
+  margin: 0; padding: 0;
+  text-align: center;
+}
+
+.active button {
+  flex-basis: 25%;
+  border: 3px solid white;
+  background-color: orange;
+  color: white;
+  margin-top: 15px;
+  margin-right: 5px;
+  font-size: 30px;
+  box-shadow: 0 0 0 3px orange;
+  outline: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: 'Sarpanch';
+}
+
+.active button:hover {
+  background-color: red;
+  box-shadow: 0 0 0 3px red;
+  
+}
+
+.active button:nth-of-type(2) {
+  background-color: #666;
+  box-shadow: 0 0 0 3px #666;
+  color: #222;
+  border-color: #222;
+}
+
+.active button:nth-of-type(2):hover {
+  background-color: #222;
+  color: #cfcfcf;
+  border-color: #cfcfcf;
+  box-shadow: 0 0 0 3px #222;
+}
+
+.team {
+  display: flex;
+  flex-flow: row;
+}
+
+.teammate {
+  margin: 20px 0 20px;
+  padding: 0 20px;
+  box-sizing: border-box;
+  /* height: 240px; */
+  flex-basis: 1px;
+  flex-grow: 1;
+  position: relative;
+  color: white;
+  display: flex;
+  align-content: left;
+  justify-content: left;
+  flex-flow: row wrap;
+}
+
+.teammate::before {
+  display: block;
+  content: ' ';
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, .6) 50%, rgb(255, 255, 255, 0) 100%);
+  width: 2px;
+  height: 100%;
+  position: absolute;
+  left: -1px;
+}
+
+.teammate:first-of-type::before {
+  display: none;
+}
+
+.teammate .badges {
+  /* position: absolute; */
+  color: white;
+  font-size: 1.2em;
+  font-weight: 800;
+}
+
+.teammate h3 {
+  /* position: absolute; */
+  /* bottom: -8px; */
+  /* left: 0; right: 0; */
+  /* font-size: 12px; */
+  flex: 0 0 100%;
+  margin: 0;
+  height: 20px;
+  text-align: center;
+}
+
+.teammate .badges div {
+  width: 30px;
+  height: 30px;
+  border-radius: 15px;
+  background-color: #222;
+  line-height: 30px;
+  text-align: center;
+  margin-top: 10px
+}
+
+.teammate h2 {
+  order: -1;
+  /* transform: rotate(-90deg); */
+  /* left: -30px; */
+  /* text-align: center; */
+  pointer-events: none;
+  flex: 0 0 100%;
+  margin: 0;
+
+}
+
+.teammate .comms {
+  position: relative;
+  width: 40px;
+}
+
+.teammate .comms.unused::after {
+  content: '';
+  width: var(--card-width);
+  height: var(--card-height);
+  border: var(--card-border-width) dashed white;
+  border-radius: var(--card-border-radius);
+  display: block;
+}
+
+.teammate .comms::before {
+  content: 'Comms';
+  display: block;
+  line-height: 20px;
+  height: 20px;
+  font-size: 12px;
+  width: var(--card-height);
+  transform: rotate(-90deg);
+  position: absolute;
+  left: -9px;
+  top: 0;
+}
+
+
+
+.teammate h2 span {
+  pointer-events: all;
+  cursor: default;
+}
+
+
+
+
+/* .teammate .tmhand .card:last-of-type {
+  width: 75px;
+  flex: 0 0 75px;
+}
+
+.teammate .tmhand .card .value, .active .tasks .card .value {
+  font-size: 60px;
+  font-weight: 900;
+  width: 0px;
+  line-height: 110px;
+  padding: 0;
+  -webkit-text-stroke-width: 3px;
+  position: relative;
+  left: 21px;
+}
+
+.teammate .card::before, .active .tasks .card::before {
+  box-shadow: 0 0 3px rgba(255, 255, 255, 0.6), 0 0 1px rgba(0, 0, 0, 0.6);
+}
+
+.teammate .card.suit-back::before {
+  font-size: 60px;
+} */
+
+.commsToken {
+  width: 21px;
+  height: 21px;
+  position: absolute;
+  top: 15px; right: 7.5px;
+  box-shadow: 0 0 0 3px red;
+  z-index: 10;
+  background-color: #222;
+  box-shadow: 1px 1px 1px #222;
+  border-radius: 12px;
+  padding: 4px;
+  box-sizing: border-box;
+}
+
+.commsToken::before {
+  content: '';
+  display: block;
+  width: 0;
+  height: 0;
+  position: relative
+}
+
+.commsToken.token-1::before {
+  border-left: 7px solid transparent;
+  border-right: 7px solid transparent;
+  border-bottom: 11px solid white;
+}
+
+.commsToken.token-3 {
+  top: 55px;
+}
+
+.commsToken.token-3::before {
+  border-radius: 7.5px;
+  width: 14px;
+  height: 14px;
+  background-color: white;
+  
+}
+
+.commsToken.token-2 {
+  top: 92px;
+}
+
+.commsToken.token-2::before {
+  border-left: 7px solid transparent;
+  border-right: 7px solid transparent;
+  border-top: 11px solid white;
+  top: 3px;
+}
+
+.badges .leadPlayer {
+  font-size: 0;
+}
+
+.badges .leadPlayer::before {
+  position:absolute;
+  content: '1';
+  font-size: 16px;
+  top: 10px;
+  left: 6px;
+}
+.badges .leadPlayer::after {
+  position:absolute;
+  content: 'st';
+  font-size: 8px;
+  top:7px;
+  border-bottom: 2px solid white;
+  height: 20px;
+}
+
+.active .tasks {
+  list-style-type: none;
+  margin: 70px 0 0;
+  padding: 0;
+  display: flex;
+}
+
+.active .tasks .card {
+  width: 75px;
+  margin: 10px;
+  cursor: pointer;
+}
+
+.active .tasks .card:hover {
+  transform: scale(1.2);
+}
+
+.hand, .teammate {
+  --card-width: calc( var(--card-height) * 0.68 );
+  --card-border-radius: calc(var(--card-width) / 20 + 7px);
+  --min-card-visible: calc(1.5 * var(--value-size));
+  --max-card-visible: calc(2 * var(--value-size) + 10px);
+  --card-border-width: calc((var(--card-width) / 20 + 7px)/2);
+}
+
+
+@media only screen and (max-width: 700px) {
+  .tmhand {
+    flex-grow: 0;
+  }
+  
+  .tmhand .card.suit-back:not(:last-of-type) {
+    min-width: 0px;
+    max-width: 0px;
+  }
+  
+  .tmhand .card.suit-back:last-of-type {
+    min-width: var(--card-width);
+    max-width: var(--card-width);
+  }
+  
+  .tmhand .card.suit-back:last-of-type::after {
+    background-color: red;
+    width: 20px;
+    height: 20px;
+    display: block;
+    border-radius: 10px;
+    position: absolute;
+    bottom: -5px; right: -5px;
+    z-index: 50;
+    text-align: center;
+    font-size: 14px;
+    line-height: 20px;
+  }
+}
+
