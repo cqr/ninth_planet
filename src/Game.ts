@@ -94,9 +94,9 @@ export interface MissionConfig {
   tokens: {[key in Token]: boolean };
 }
 
-const Deck: ICard[] = [Suit.Pink, Suit.Blue, Suit.Green, Suit.Orange].flatMap((suit) => {
+const Deck: ICard[] = flatten([Suit.Pink, Suit.Blue, Suit.Green, Suit.Orange].map((suit) => {
   return new Array(9).fill(undefined).map((_, index) => ({suit, value: index + 1}));
-}).concat(new Array(4).fill('undefined').map((_, index) => ({suit: Suit.Rocket, value: index + 1 })));
+})).concat(new Array(4).fill('undefined').map((_, index) => ({suit: Suit.Rocket, value: index + 1 })));
 
 function sortHand(hand: ICard[]): ICard[] {
   return hand.sort((a, b) => {
@@ -187,7 +187,7 @@ export const NinthPlanet: Game<GameState> = {
         const highCard = getHighCard(G.trick.cards, leadSuit);
         const highCardIndex = G.trick.cards.findIndex(card => matchCards(highCard, card));
         const winner = ctx.playOrder[highCardIndex];
-        const allTaskCards = Object.keys(G.team).flatMap(playerID => G.team[playerID].tasks.map(x => ({...x, playerID})));
+        const allTaskCards = flatten(Object.keys(G.team).map(playerID => G.team[playerID].tasks.map(x => ({...x, playerID}))));
         const team = { ...G.team };
 
         for (const card of G.trick.cards) {
@@ -363,4 +363,8 @@ function highLowOnly(card: ICard, cardsOfSuit: ICard[]) {
 
 function cardCmp(card1:ICard, card2:ICard) {
   return (card1.suit * 10 + card1.value) - (card2.suit * 10 + card2.value);
+}
+
+function flatten<T>(data: (T[]|T)[]): T[] {
+  return (Array.isArray(data[0]) ? data[0] : [data[0]]).concat(...data.slice(1));
 }
