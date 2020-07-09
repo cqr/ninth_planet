@@ -19,7 +19,8 @@
     "typescript": "^3.7.5"
   },
   "scripts": {
-    "start": "concurrently --kill-others  'react-scripts start' 'npm run serve'",
+    "start": "npm run prod-server",
+    "dev-start": "concurrently --kill-others  'react-scripts start' 'npm run serve'",
     "prod-server": "ts-node --script-mode -O '{\"module\": \"commonjs\"}' --transpile-only src/server",
     "serve": "ts-node --script-mode -O '{\"module\": \"commonjs\"}' --transpile-only src/server",
     "build": "react-scripts build",
