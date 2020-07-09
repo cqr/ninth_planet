@@ -16,7 +16,8 @@
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-scripts": "3.4.1",
-    "typescript": "^3.7.5"
+    "typescript": "^3.7.5",
+    "ts-node": "^8.10.2"
   },
   "scripts": {
     "start": "npm run prod-server",
@@ -45,7 +46,6 @@
   "devDependencies": {
     "boardgame.io": "^0.39.14",
     "concurrently": "^5.2.0",
-    "framer-motion": "^2.0.0-beta.77",
-    "ts-node": "^8.10.2"
+    "framer-motion": "^2.0.0-beta.77"
   }
 }
