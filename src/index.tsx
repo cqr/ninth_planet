@@ -3,14 +3,12 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
-const url = new URL(document.location.href)
+const url = new URL(document.location.href);
 const playerId = url.searchParams.get('playerId') || '0';
 
 ReactDOM.render(
   <React.StrictMode>
-    <App playerID="0" />
-    <App playerID="1" />
-    <App playerID="2" />
+    <App playerID={playerId} />
   </React.StrictMode>,
   document.getElementById('root')
 );

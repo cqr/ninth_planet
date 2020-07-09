@@ -78,7 +78,7 @@ const Phase: FC<{ G: GameState, ctx: Ctx, phase?: string, onTransmit: any, onSil
   if (props.phase === 'wait' || props.phase === 'transmit') {
     return <TransmissionUI passed={false} onTransmit={props.onTransmit} onSilence={props.onSilence} transmitting={props.phase === 'transmit'} />
   } else if (props.phase === 'join') {
-    onJoin('Chrisxx');
+    // onJoin('Chrisxx');
     return <form onSubmit={onSubmitJoin}><input type="text" onChange={onNameChange} value={name} /><button type="submit">join</button></form>;
   } else if (props.phase === 'defineMission') {
     return <form onSubmit={onSubmitDefine}><label htmlFor="taskCount">Number of Tasks:</label><input type="number" value={taskCount} onChange={onTaskCountChange} /><label>Tokens</label><button type="submit">Start Mission</button></form>;

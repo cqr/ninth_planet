@@ -1,13 +1,13 @@
-import React from 'react';
+// import React from 'react';
 import { Client } from 'boardgame.io/react';
-import { Local, SocketIO } from 'boardgame.io/multiplayer'
+import { SocketIO } from 'boardgame.io/multiplayer'
 import { NinthPlanet } from './Game';
 import { Board } from './Board';
 import { Transport, TransportOpts } from 'boardgame.io/dist/types/src/client/transport/transport';
 
-const gameComponents = [
-  {game: NinthPlanet, board: Board}
-];
+// const gameComponents = [
+//   {game: NinthPlanet, board: Board}
+// ];
 
 
 // export default function App(props:any) {
@@ -17,7 +17,7 @@ const gameComponents = [
 //     gameComponents={gameComponents} debug={true} />;
 // }
 
-export default Client({ game: NinthPlanet, board: Board, numPlayers: 3, debug: true, multiplayer: Local() as (opts: TransportOpts) => Transport });
+export default Client({ game: NinthPlanet, board: Board, numPlayers: 3, debug: true, multiplayer: SocketIO({server: 'http://localhost:8000'}) as (opts: TransportOpts) => Transport });
 
 
 

@@ -7,17 +7,20 @@
     "@testing-library/react": "^9.5.0",
     "@testing-library/user-event": "^7.2.1",
     "@types/jest": "^24.9.1",
+    "@types/koa-static": "^4.0.1",
     "@types/node": "^12.12.47",
     "@types/react": "^16.9.38",
     "@types/react-dom": "^16.9.8",
     "esm": "^3.2.25",
+    "koa-static": "^5.0.0",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-scripts": "3.4.1",
     "typescript": "^3.7.5"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "start": "concurrently --kill-others  'react-scripts start' 'npm run serve'",
+    "prod-server": "ts-node --script-mode -O '{\"module\": \"commonjs\"}' --transpile-only src/server",
     "serve": "ts-node --script-mode -O '{\"module\": \"commonjs\"}' --transpile-only src/server",
     "build": "react-scripts build",
     "test": "react-scripts test",
@@ -40,6 +43,8 @@
   },
   "devDependencies": {
     "boardgame.io": "^0.39.14",
+    "concurrently": "^5.2.0",
+    "framer-motion": "^2.0.0-beta.77",
     "ts-node": "^8.10.2"
   }
 }
