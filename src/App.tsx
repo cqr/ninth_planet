@@ -17,7 +17,7 @@ import { Transport, TransportOpts } from 'boardgame.io/dist/types/src/client/tra
 //     gameComponents={gameComponents} debug={true} />;
 // }
 
-export default Client({ game: NinthPlanet, board: Board, numPlayers: 3, multiplayer: SocketIO() as (opts: TransportOpts) => Transport });
+export default Client({ game: NinthPlanet, board: Board, numPlayers: 3, multiplayer: SocketIO({server: window.location.hostname === 'localhost' ? 'http://localhost:8000' : undefined }) as (opts: TransportOpts) => Transport });
 
 
 
