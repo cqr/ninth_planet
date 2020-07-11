@@ -35,7 +35,7 @@ export enum Token {
   Priority4
 }
 
-const SortedTokens: Token[] = [
+export const SortedTokens: Token[] = [
   Token.First, Token.Second, Token.Third, Token.Fourth,
   Token.Fifth, Token.Last, Token.Priority1, Token.Priority2,
   Token.Priority3, Token.Priority4

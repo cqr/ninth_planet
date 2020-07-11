@@ -1,6 +1,6 @@
 import React, { FC, useState, useCallback } from 'react';
 import { BoardProps, Ctx } from 'boardgame.io';
-import { GameState, ICard, ITeammate, isValidPlay, CommsState, MissionConfig, ITask, Token, TeammateTask } from './Game';
+import { GameState, ICard, ITeammate, isValidPlay, CommsState, MissionConfig, ITask, Token, TeammateTask, SortedTokens } from './Game';
 
 const MAX_HAND_SIZE = 15;
 
@@ -58,10 +58,18 @@ function statusMessage(playerID: string, currentPlayerID: string, currentPlayerN
 const Phase: FC<{ G: GameState, ctx: Ctx, phase?: string, onTransmit: any, onSilence: any, onJoin: any, onDefineMission: any, onTaskSelected: any }> = (props) => {
   const [name, setName] = useState("");
   const [taskCount, setTaskCount] = useState(0);
-  const [tokenMap, setTokenMap] = useState({});
+  const [tokenMap, setTokenMap] = useState(() => {
+    return SortedTokens.reduce<{ [key in Token]: boolean }>((map, tokenName) => {
+      map[tokenName] = false;
+      return map;
+    }, {} as { [key in Token]: boolean})
+  });
   const onNameChange = useCallback(event => {
     setName(event.target.value);
-  }, [setName])
+  }, [setName]);
+  const onTokenMapChange = useCallback(value => {
+    setTokenMap(value);
+  }, [setTokenMap]);
   const { onJoin, onDefineMission } = props;
   const onSubmitJoin = useCallback(event => {
     event.preventDefault();
@@ -78,10 +86,10 @@ const Phase: FC<{ G: GameState, ctx: Ctx, phase?: string, onTransmit: any, onSil
   if (props.phase === 'wait' || props.phase === 'transmit') {
     return <TransmissionUI passed={false} onTransmit={props.onTransmit} onSilence={props.onSilence} transmitting={props.phase === 'transmit'} />
   } else if (props.phase === 'join') {
-    // onJoin('Chrisxx');
+    // onJoin('chrisxx');
     return <form onSubmit={onSubmitJoin}><input type="text" onChange={onNameChange} value={name} /><button type="submit">join</button></form>;
   } else if (props.phase === 'defineMission') {
-    return <form onSubmit={onSubmitDefine}><label htmlFor="taskCount">Number of Tasks:</label><input type="number" value={taskCount} onChange={onTaskCountChange} /><label>Tokens</label><button type="submit">Start Mission</button></form>;
+    return <form onSubmit={onSubmitDefine}><label htmlFor="taskCount">Number of Tasks:</label><input type="number" value={taskCount} onChange={onTaskCountChange} /><label>Tokens</label><TokenMap tokens={Token} value={tokenMap} onChange={onTokenMapChange} /><button type="submit">Start Mission</button></form>;
   } else if (props.G.tasks.length) {
     return <TaskSelector tasks={props.G.tasks} onTaskSelected={props.onTaskSelected} />
   }
@@ -90,6 +98,29 @@ const Phase: FC<{ G: GameState, ctx: Ctx, phase?: string, onTransmit: any, onSil
 
 const TaskSelector: FC<{ tasks: ITask[], onTaskSelected: any }> = (props) => {
   return <ul className="tasks">{props.tasks.map((task, i) => <li key={JSON.stringify(task.card)} onClick={() => props.onTaskSelected(i)}><Card card={task.card} validPlay={true} /></li>)}</ul>;
+}
+
+function TokenMap(props: {tokens: typeof Token, value: { [ key in Token] : boolean}, onChange: (val:{[key in Token]: boolean}) => unknown }) {
+  const { onChange, tokens, value } = props;
+  const setValue = useCallback((checkboxValue, tokenType) => {
+    const newVal = { ...value, [tokens[tokenType]]: checkboxValue };
+    onChange(newVal);
+  }, [tokens, value, onChange] );
+  return <>
+    { Object.keys(value)
+        .map<Token>((val: string) => parseInt(val, 10) as Token)
+        .map<[Token, boolean]>((val: Token) => [val, value[val] as boolean])
+        .map(([tokenId, val]) => <TokenCheckbox type={tokens[tokenId]} value={val} onChange={setValue} />)
+      }
+  </>;
+}
+
+function TokenCheckbox(props: { type: string, value: boolean, onChange: (val: boolean, tokenType: string) => unknown }) {
+  const { type, value, onChange } = props;
+  const changed = useCallback((event) => {
+    onChange(event.target.checked, type);
+  }, [onChange, type]);
+  return <input type="checkbox" className={type} checked={value} onChange={changed} />;
 }
 
 function TransmissionUI(props: { passed: boolean, onTransmit: any, onSilence: any, transmitting: boolean }) {

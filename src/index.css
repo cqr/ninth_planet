@@ -4,7 +4,7 @@ html {
   height: 100%;
 }
 
-body {
+body, input {
   margin: 0;
   font-family: 'Sarpanch', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
@@ -74,11 +74,13 @@ body {
   }
 }
 
-
+body, #root, .bgio-client, .board {
+  height: 100%;
+}
 
 .board {
   position: relative;
-  /* height: 600px; */
+  height: 100%;
   /* margin-bottom: 650px; */
   background-image: linear-gradient(to bottom,black 0%, black 30%, rgb(0, 0, 49) 50%, rgb(0, 0, 49) 100%);
   overflow: hidden;
@@ -656,3 +658,55 @@ code {
   }
 }
 
+
+form {
+  display: flex;
+  flex-flow: row wrap;
+  height: 100px;
+}
+
+label, input {
+  flex: 0 0 50%;
+  max-width: 45px;
+}
+
+input[type=checkbox] {
+  background: rgb(0, 25, 53);
+  color: rgb(0, 0, 190);
+  min-width: 100px;
+  height: 100px;
+  display: block;
+  appearance: none;
+  border-radius: 50%;
+  filter: grayscale(1) contrast(0.4) brightness(1.3);
+  transition: filter 0.2s, box-shadow 0.2s;
+  cursor: pointer;
+  box-shadow: rgba(255, 255, 255, 0.4) 0 0 0 2px inset;
+}
+
+input[type=checkbox]::after {
+  display: block;
+  width: 100%;
+  text-align: center;
+  line-height: 92px;
+  font-weight: 900;
+  font-size: 75px;
+  -webkit-text-stroke: 2px white;
+}
+
+input[type=checkbox]:checked {
+  filter: none;
+  box-shadow: white 0 0 0 2px inset;
+}
+
+input.First[type=checkbox]::after { content: '1' }
+input.Second[type=checkbox]::after { content: '2' }
+input.Third[type=checkbox]::after { content: '3' }
+input.Fourth[type=checkbox]::after { content: '4' }
+input.Fifth[type=checkbox]::after { content: '5' }
+input.Last[type=checkbox]::after { content: 'Ω' }
+
+input.Priority1[type=checkbox]::after { content: '>' }
+input.Priority2[type=checkbox]::after { content: '>>'}
+input.Priority3[type=checkbox]::after { content: '>>>'}
+input.Priority4[type=checkbox]::after { content: '>>>>' }
