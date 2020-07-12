@@ -119,20 +119,20 @@ export const NinthPlanet: Game<GameState> = {
   name: 'NinthPlanet',
 
   setup: (ctx, setupData): GameState => {
-    const deck = ctx.random!.Shuffle(Deck);
-
-    const hands = Array(ctx.numPlayers).fill(undefined).map<PlayerState>((_, playerNumber) => {
-      const hand = sortHand(deck.filter((_, ci) => ci % ctx.numPlayers === playerNumber));
-      return { hand, commsTokenState: CommsState.Unused, tasks: [] };
-    });
-    const players = hands.reduce<{ [playerId: string]: PlayerState }>((c, n, i) => { c[i.toString()] = n; return c }, {});
-    const captain = hands.findIndex(isCaptain).toString();
+    
+    const players = Array(ctx.numPlayers)
+      .fill({ hand:[], commsTokenState: CommsState.Unused, tasks: [] })
+      .reduce<{ [playerId: string]: PlayerState }>((c, n, i) => {
+        c[i.toString()] = n;
+        return c;
+      }, {});
+    const captain = '-1';
     const val: GameState = {
       captain,
       players,
       trick: {
         cards: [],
-        leadPlayer: captain
+        leadPlayer: '0'
       },
       team: deriveTeamState(players),
       tasks: [],
@@ -156,6 +156,28 @@ export const NinthPlanet: Game<GameState> = {
     },
     defineMission: {
       onBegin(_, ctx) { ctx.events?.setActivePlayers?.({ all: 'defineMission' }) },
+      onEnd(G, ctx) {
+        const deck = ctx.random!.Shuffle(Deck);
+
+        const players = Object.keys(G.players).map<[string, PlayerState]>((playerId) => {
+          const playerNumber = parseInt(playerId, 10);
+          const hand = sortHand(deck.filter((_, ci) => ci % ctx.numPlayers === playerNumber));
+          return [playerId, { ...G.players[playerId], hand }];
+        }).reduce<{[playerId: string]:PlayerState}>((c, [playerId, state]) => {
+          c[playerId] = state;
+          return c;
+        }, {});
+        const captain = Object.values(players).findIndex(isCaptain).toString();
+        return {
+          ...G,
+          captain,
+          players,
+          trick: {
+            ...G.trick, leadPlayer: captain
+          },
+          team: deriveTeamState(players)
+        };
+      },
       next: 'selectTasks'
     },
     selectTasks: {
@@ -241,7 +263,6 @@ export const NinthPlanet: Game<GameState> = {
       join: {
         moves: {
           setName: (G, ctx, name) => {
-            console.log(ctx);
             const playerID = ctx.playerID || ctx.currentPlayer;
             const me = { ...G.players[playerID], name: name };
             ctx.events?.endStage?.();
